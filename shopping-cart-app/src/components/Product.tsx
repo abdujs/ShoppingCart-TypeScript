@@ -1,23 +1,24 @@
 import React from 'react';
-import { useCart } from '../hooks/useCart';
+import { useCart } from '../context/CartContext';
 import { Product as ProductType } from '../types';
+import { formatPrice } from '../utils/helpers';
 
 interface ProductProps {
     product: ProductType;
 }
 
 const Product: React.FC<ProductProps> = ({ product }) => {
-    const { addToCart } = useCart();
+    const { addItem } = useCart();
 
     const handleAddToCart = () => {
-        addToCart(product);
+        addItem(product);
     };
 
     return (
         <div className="product">
             <h2>{product.name}</h2>
             <p>{product.description}</p>
-            <p>Price: ${product.price.toFixed(2)}</p>
+            <p>Price: {formatPrice(product.price)}</p>
             <button onClick={handleAddToCart}>Add to Cart</button>
         </div>
     );
