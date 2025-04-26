@@ -1,15 +1,5 @@
-import React, { createContext, useContext, useReducer, ReactNode } from 'react';
-
-interface Product {
-    id: number;
-    name: string;
-    price: number;
-}
-
-interface CartItem {
-    product: Product;
-    quantity: number;
-}
+import React, { createContext, useReducer, ReactNode } from 'react';
+import { Product, CartItem } from '../types';
 
 interface CartState {
     items: CartItem[];
@@ -18,8 +8,9 @@ interface CartState {
 interface CartContextType {
     state: CartState;
     addItem: (product: Product) => void;
-    removeItem: (productId: number) => void;
+    removeItem: (productId: string) => void;
     clearCart: () => void;
+    calculateTotal: () => number;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -64,7 +55,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         dispatch({ type: 'ADD_ITEM', payload: product });
     };
 
-    const removeItem = (productId: number) => {
+    const removeItem = (productId: string) => {
         dispatch({ type: 'REMOVE_ITEM', payload: productId });
     };
 
@@ -72,15 +63,19 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         dispatch({ type: 'CLEAR_CART' });
     };
 
+    const calculateTotal = () => {
+        return state.items.reduce((total, item) => total + item.product.price * item.quantity, 0);
+    };
+
     return (
-        <CartContext.Provider value={{ state, addItem, removeItem, clearCart }}>
+        <CartContext.Provider value={{ state, addItem, removeItem, clearCart, calculateTotal }}>
             {children}
         </CartContext.Provider>
     );
 };
 
 export const useCart = (): CartContextType => {
-    const context = useContext(CartContext);
+    const context = React.useContext(CartContext);
     if (!context) {
         throw new Error('useCart must be used within a CartProvider');
     }
