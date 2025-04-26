@@ -1,26 +1,26 @@
-import React, { useContext } from 'react';
-import { CartContext } from '../context/CartContext';
-import { CartItem } from '../types';
+import React from 'react';
+import { useCart } from '../context/CartContext';
+import { formatPrice } from '../utils/helpers';
 
 const Cart: React.FC = () => {
-    const { cartItems, removeItem, calculateTotal } = useContext(CartContext);
+    const { state, removeItem, calculateTotal } = useCart();
 
     return (
         <div>
             <h2>Shopping Cart</h2>
-            {cartItems.length === 0 ? (
+            {state.items.length === 0 ? (
                 <p>Your cart is empty.</p>
             ) : (
                 <ul>
-                    {cartItems.map((item: CartItem) => (
-                        <li key={item.id}>
-                            {item.name} - ${item.price}
-                            <button onClick={() => removeItem(item.id)}>Remove</button>
+                    {state.items.map(({ product, quantity }) => (
+                        <li key={product.id}>
+                            {product.name} - {formatPrice(product.price)} x {quantity}
+                            <button onClick={() => removeItem(product.id)}>Remove</button>
                         </li>
                     ))}
                 </ul>
             )}
-            <h3>Total: ${calculateTotal()}</h3>
+            <h3>Total: {formatPrice(calculateTotal())}</h3>
         </div>
     );
 };
